@@ -795,6 +795,22 @@ let dataJSON = {
 let usuarios = [];
 
 
+function formatearFecha(fecha) {
+    // Separar la fecha en día, mes y año
+    const [dia, mes, año] = fecha.split("/");
+
+    // Retornar el formato deseado
+    return `${año}-${mes}-${dia} `;
+}
+
+function extraerHoraYMinuto(horaCompleta) {
+    // Dividir la cadena usando ":" como separador
+    const [hora, minuto] = horaCompleta.split(":");
+
+    // Retornar los valores de hora y minuto
+    return { hora, minuto };
+}
+
 document.getElementById("btnJSON").addEventListener('click', async e => {
 	let data = { fecha1: $("#fecha1").val(), fecha2: $("#fecha2").val() };
 	const response = await fetch(url + "ripsUsuarios", {
@@ -806,11 +822,56 @@ document.getElementById("btnJSON").addEventListener('click', async e => {
 	});
 	const datos = await response.json();
 	if(datos.length){	
-		datos.forEach((dato,index) => {
-			const { identificacion ,tdei,tu,sexo,fecnac,codmunic} = dato;
+		const fecha1=document.getElementById("fecha1").value;
+		const fecha2=document.getElementById("fecha2").value;
+
+		datos.forEach(async (dato,index) => {
+			const { identificacion ,tdei,tu,sexo,fecnac,codmunic,apellido1,apellido2,nombre1,nombre2} = dato;
+			const consultas = await fetch(url + "ripsConsultai", {
+				method: 'POST', // or 'PUT'
+				body: JSON.stringify({ paciente: identificacion,fecha1, fecha2 }),
+				headers: {
+					'Content-Type': 'application/json'
+				} 
+			});
+			const dconsultas=await consultas.json();
+			const dataConsultas=[];
+			dconsultas.forEach((consulta,index2)=>{
+				const {cod_prestador,fechaj,hora,diagnostico_principal,diagnostico_relacionado1,diagnostico_relacionado2,diagnostico_relacionado3,tipo_dx,valor_consulta}=consulta;
+				dataConsultas.push({
+					codprestador:cod_prestador,
+					fechaInicioAtencion:`${fechaj} ${extraerHoraYMinuto(hora)}`,
+					numAutorizacion:"",
+					codConsulta:"890304",
+					modalidadGrupoServicioTecSal:"01",
+					gruposServicios:"01",
+					codServicio:"01",
+					finalidadTecnologiaSalud:"16",
+					causaMotivoAtencion:"38",
+					codDiagnosticoPrincipal:diagnostico_principal,
+					codDiagnosticoRelacionado1:diagnostico_relacionado1,
+					codDiagnosticoRelacionado2:diagnostico_relacionado2,
+					codDiagnosticoRelacionado3:diagnostico_relacionado3,
+					tipoDiagnosticoPrincipal:tipo_dx,
+					tipoDocumentoIdentificacion:tdei,
+					numDocumentoIdentificacion:identificacion,
+					vrServicio:valor_consulta,
+					conceptoRecaudo:"05",
+					valorPagoModerador:"0",
+					numFEVPagoModerador:"0",
+					consecutivo:index2+1,
+
+
+				});
+
+			});
 			usuarios.push({
 				tipoDocumentoIdentificacion: tdei,
 				numDocumentoIdentificacion: identificacion,
+				primerApellido:apellido1,
+				segundoApellido:apellido2,
+				primerNombre:nombre1,
+				segundoNombre:nombre2,
 				tipoUsuario: tu,
 				fechaNacimiento: fecnac,
 				codSexo: sexo,
@@ -821,7 +882,7 @@ document.getElementById("btnJSON").addEventListener('click', async e => {
 				codPaisOrigen: "170",
 				consecutivo: index+1,
 				servicios: {
-					consultas: [],
+					consultas: dataConsultas,
 					procedimientos:[],
 				}
 			});
