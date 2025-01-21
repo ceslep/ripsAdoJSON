@@ -139,6 +139,13 @@ app.post('/ripsProcedimientos', async (req, res) => {
 });
 
 
+app.post('/ripsProcedimientosi', async (req, res) => {
+
+
+  res.send(await getDatai("ripsProcedimientosi", req.body));
+
+});
+
 app.post('/ripsTransacciones', async (req, res) => {
 
 

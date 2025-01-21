@@ -796,23 +796,26 @@ let usuarios = [];
 
 
 function formatearFecha(fecha) {
-    // Separar la fecha en día, mes y año
-    const [dia, mes, año] = fecha.split("/");
+	// Separar la fecha en día, mes y año
+	const [dia, mes, año] = fecha.split("/");
 
-    // Retornar el formato deseado
-    return `${año}-${mes}-${dia} `;
+	// Retornar el formato deseado
+	return `${año}-${mes}-${dia} `;
 }
 
 function extraerHoraYMinuto(horaCompleta) {
-    // Dividir la cadena usando ":" como separador
-    const [hora, minuto] = horaCompleta.split(":");
+	// Dividir la cadena usando ":" como separador
+	const [hora, minuto] = horaCompleta.split(":");
 
-    // Retornar los valores de hora y minuto
-    return { hora, minuto };
+	// Retornar los valores de hora y minuto
+	return `${hora}:${minuto} `;
 }
 
+const modalJSONelement = document.getElementById("modalJSON");
+let modalJSON;
+
 document.getElementById("btnJSON").addEventListener('click', async e => {
-	let data = { fecha1: $("#fecha1").val(), fecha2: $("#fecha2").val() };
+	/* let data = { fecha1: $("#fecha1").val(), fecha2: $("#fecha2").val() };
 	const response = await fetch(url + "ripsUsuarios", {
 		method: 'POST', // or 'PUT'
 		body: JSON.stringify(data), // data can be `string` or {object}!
@@ -821,57 +824,94 @@ document.getElementById("btnJSON").addEventListener('click', async e => {
 		}
 	});
 	const datos = await response.json();
-	if(datos.length){	
-		const fecha1=document.getElementById("fecha1").value;
-		const fecha2=document.getElementById("fecha2").value;
+	if (datos.length) {
+		const fecha1 = document.getElementById("fecha1").value;
+		const fecha2 = document.getElementById("fecha2").value;
 
-		datos.forEach(async (dato,index) => {
-			const { identificacion ,tdei,tu,sexo,fecnac,codmunic,apellido1,apellido2,nombre1,nombre2} = dato;
+		datos.forEach(async (dato, index) => {
+			const { identificacion, tdei, tu, sexo, fecnac, codmunic, apellido1, apellido2, nombre1, nombre2 } = dato;
 			const consultas = await fetch(url + "ripsConsultai", {
 				method: 'POST', // or 'PUT'
-				body: JSON.stringify({ paciente: identificacion,fecha1, fecha2 }),
+				body: JSON.stringify({ paciente: identificacion, fecha1, fecha2 }),
 				headers: {
 					'Content-Type': 'application/json'
-				} 
+				}
 			});
-			const dconsultas=await consultas.json();
-			const dataConsultas=[];
-			dconsultas.forEach((consulta,index2)=>{
-				const {cod_prestador,fechaj,hora,diagnostico_principal,diagnostico_relacionado1,diagnostico_relacionado2,diagnostico_relacionado3,tipo_dx,valor_consulta}=consulta;
+			const dconsultas = await consultas.json();
+			const dataConsultas = [];
+			dconsultas.forEach((consulta, index2) => {
+				const { cod_prestador, fechaj, hora, diagnostico_principal, diagnostico_relacionado1, diagnostico_relacionado2, diagnostico_relacionado3, tipo_dx, valor_consulta } = consulta;
 				dataConsultas.push({
-					codprestador:cod_prestador,
-					fechaInicioAtencion:`${fechaj} ${extraerHoraYMinuto(hora)}`,
-					numAutorizacion:"",
-					codConsulta:"890304",
-					modalidadGrupoServicioTecSal:"01",
-					gruposServicios:"01",
-					codServicio:"01",
-					finalidadTecnologiaSalud:"16",
-					causaMotivoAtencion:"38",
-					codDiagnosticoPrincipal:diagnostico_principal,
-					codDiagnosticoRelacionado1:diagnostico_relacionado1,
-					codDiagnosticoRelacionado2:diagnostico_relacionado2,
-					codDiagnosticoRelacionado3:diagnostico_relacionado3,
-					tipoDiagnosticoPrincipal:tipo_dx,
-					tipoDocumentoIdentificacion:tdei,
-					numDocumentoIdentificacion:identificacion,
-					vrServicio:valor_consulta,
-					conceptoRecaudo:"05",
-					valorPagoModerador:"0",
-					numFEVPagoModerador:"0",
-					consecutivo:index2+1,
+					codprestador: cod_prestador,
+					fechaInicioAtencion: `${fechaj} ${extraerHoraYMinuto(hora)}`,
+					numAutorizacion: "",
+					codConsulta: "890304",
+					modalidadGrupoServicioTecSal: "01",
+					gruposServicios: "01",
+					codServicio: "01",
+					finalidadTecnologiaSalud: "16",
+					causaMotivoAtencion: "38",
+					codDiagnosticoPrincipal: diagnostico_principal,
+					codDiagnosticoRelacionado1: diagnostico_relacionado1,
+					codDiagnosticoRelacionado2: diagnostico_relacionado2,
+					codDiagnosticoRelacionado3: diagnostico_relacionado3,
+					tipoDiagnosticoPrincipal: tipo_dx,
+					tipoDocumentoIdentificacion: tdei,
+					numDocumentoIdentificacion: identificacion,
+					vrServicio: valor_consulta,
+					conceptoRecaudo: "05",
+					valorPagoModerador: "0",
+					numFEVPagoModerador: "0",
+					consecutivo: index2 + 1,
 
 
 				});
 
 			});
+
+			const procedimientos = await fetch(url + "ripsProcedimientosi", {
+				method: 'POST', // or 'PUT'
+				body: JSON.stringify({ paciente: identificacion, fecha1, fecha2 }),
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+			const dprocedimientos = await procedimientos.json();
+			console.log(dprocedimientos);
+			const dataProcedimientos = [];
+			dprocedimientos.forEach((procedimiento, index3) => {
+				const { cod_prestador, fechaj, hora, diagnostico_principal, diagnostico_relacionado1,valor } = procedimiento;
+				dataProcedimientos.push({
+					codPrestador: cod_prestador,
+					fechalnicioAtencion: `${fechaj} ${extraerHoraYMinuto(hora)}`,
+					idMIPRES: null,
+					numAutorizacion: null,
+					codProcedimiento: "893106",
+					viaIngresoServicioSalud: "01",
+					modalidadGrupoServicioTecSal: "01",
+					grupoServicios: "04",
+					codServicio: 338,
+					finalidadTecnologiaSalud: "44",
+					tipoDocumentoldenfificacion: tdei,
+					numDocumentoldentificacion: identificacion,
+					codDiagnosticoPrincipal: diagnostico_principal,
+					codDiagnosticoRelacionado: diagnostico_relacionado1,
+					codComplicacion: "0",
+					vrServicio: valor,
+					conceptoRecaudo: "05",
+					valorPagoModerador: "0",
+					numFEVPagoModerador: "",
+					consecutivo: index3+1
+				});
+			});
+
 			usuarios.push({
 				tipoDocumentoIdentificacion: tdei,
 				numDocumentoIdentificacion: identificacion,
-				primerApellido:apellido1,
-				segundoApellido:apellido2,
-				primerNombre:nombre1,
-				segundoNombre:nombre2,
+				primerApellido: apellido1,
+				segundoApellido: apellido2,
+				primerNombre: nombre1,
+				segundoNombre: nombre2,
 				tipoUsuario: tu,
 				fechaNacimiento: fecnac,
 				codSexo: sexo,
@@ -880,14 +920,154 @@ document.getElementById("btnJSON").addEventListener('click', async e => {
 				codZonaTerritorialResidencia: "01",
 				incapacidad: "NO",
 				codPaisOrigen: "170",
-				consecutivo: index+1,
+				consecutivo: index + 1,
 				servicios: {
 					consultas: dataConsultas,
-					procedimientos:[],
+					procedimientos: dataProcedimientos,
 				}
 			});
 		});
 		dataJSON.usuarios = usuarios;
-		console.log(dataJSON);
+		if (!modalJSON) {
+			modalJSON = new bootstrap.Modal(modalJSONelement);
+		}
+		const textAreaJSON= document.getElementById("textAreaJSON");
+		textAreaJSON.value = JSON.stringify(dataJSON, null, 2);
+		modalJSON.show();
 	}
+		
+	
+	*/
+
+
+	let data = { fecha1: $("#fecha1").val(), fecha2: $("#fecha2").val() };
+	const response = await fetch(url + "ripsUsuarios", {
+		method: 'POST',
+		body: JSON.stringify(data),
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	});
+	const datos = await response.json();
+
+	if (datos.length) {
+		const fecha1 = document.getElementById("fecha1").value;
+		const fecha2 = document.getElementById("fecha2").value;
+
+		const usuarios = [];
+		const promises = datos.map(async (dato, index) => {
+			const { identificacion, tdei, tu, sexo, fecnac, codmunic, apellido1, apellido2, nombre1, nombre2 } = dato;
+
+			// Fetch consultas
+			const consultasResponse = await fetch(url + "ripsConsultai", {
+				method: 'POST',
+				body: JSON.stringify({ paciente: identificacion, fecha1, fecha2 }),
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+			const dconsultas = await consultasResponse.json();
+			const dataConsultas = dconsultas.map((consulta, index2) => {
+				const { cod_prestador, fechaj, hora, diagnostico_principal, diagnostico_relacionado1, diagnostico_relacionado2, diagnostico_relacionado3, tipo_dx, valor_consulta } = consulta;
+				return {
+					codprestador: cod_prestador,
+					fechaInicioAtencion: `${fechaj} ${extraerHoraYMinuto(hora)}`,
+					numAutorizacion: "",
+					codConsulta: "890304",
+					modalidadGrupoServicioTecSal: "01",
+					gruposServicios: "01",
+					codServicio: "01",
+					finalidadTecnologiaSalud: "16",
+					causaMotivoAtencion: "38",
+					codDiagnosticoPrincipal: diagnostico_principal,
+					codDiagnosticoRelacionado1: diagnostico_relacionado1,
+					codDiagnosticoRelacionado2: diagnostico_relacionado2,
+					codDiagnosticoRelacionado3: diagnostico_relacionado3,
+					tipoDiagnosticoPrincipal: tipo_dx,
+					tipoDocumentoIdentificacion: tdei,
+					numDocumentoIdentificacion: identificacion,
+					vrServicio: valor_consulta,
+					conceptoRecaudo: "05",
+					valorPagoModerador: "0",
+					numFEVPagoModerador: "0",
+					consecutivo: index2 + 1,
+				};
+			});
+
+			// Fetch procedimientos
+			const procedimientosResponse = await fetch(url + "ripsProcedimientosi", {
+				method: 'POST',
+				body: JSON.stringify({ paciente: identificacion, fecha1, fecha2 }),
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+			const dprocedimientos = await procedimientosResponse.json();
+			const dataProcedimientos = dprocedimientos.map((procedimiento, index3) => {
+				const { cod_prestador, fechaj, hora, diagnostico_principal, diagnostico_relacionado1, valor } = procedimiento;
+				return {
+					codPrestador: cod_prestador,
+					fechalnicioAtencion: `${fechaj} ${extraerHoraYMinuto(hora)}`,
+					idMIPRES: null,
+					numAutorizacion: null,
+					codProcedimiento: "893106",
+					viaIngresoServicioSalud: "01",
+					modalidadGrupoServicioTecSal: "01",
+					grupoServicios: "04",
+					codServicio: 338,
+					finalidadTecnologiaSalud: "44",
+					tipoDocumentoldenfificacion: tdei,
+					numDocumentoldentificacion: identificacion,
+					codDiagnosticoPrincipal: diagnostico_principal,
+					codDiagnosticoRelacionado: diagnostico_relacionado1,
+					codComplicacion: "0",
+					vrServicio: valor,
+					conceptoRecaudo: "05",
+					valorPagoModerador: "0",
+					numFEVPagoModerador: "",
+					consecutivo: index3 + 1
+				};
+			});
+
+			// Push user data
+			usuarios.push({
+				tipoDocumentoIdentificacion: tdei,
+				numDocumentoIdentificacion: identificacion,
+				primerApellido: apellido1,
+				segundoApellido: apellido2,
+				primerNombre: nombre1,
+				segundoNombre: nombre2,
+				tipoUsuario: tu,
+				fechaNacimiento: fecnac,
+				codSexo: sexo,
+				codPaisResidencia: "170",
+				codMunicipioResidencia: codmunic,
+				codZonaTerritorialResidencia: "01",
+				incapacidad: "NO",
+				codPaisOrigen: "170",
+				consecutivo: index + 1,
+				servicios: {
+					consultas: dataConsultas,
+					procedimientos: dataProcedimientos,
+				}
+			});
+		});
+
+		// Wait for all promises to resolve
+		await Promise.all(promises);
+
+		// Populate the textarea and show the modal
+		const dataJSON = { usuarios };
+		const textAreaJSON = document.getElementById("textAreaJSON");
+		textAreaJSON.value = JSON.stringify(dataJSON, null, 2);
+
+		if (!modalJSON) {
+			modalJSON = new bootstrap.Modal(modalJSONelement);
+		}
+		const jsonViewer = document.querySelector("andypf-json-viewer");
+		jsonViewer.data = dataJSON;
+		jsonViewer.expanded=5;
+		modalJSON.show();
+	}
+
 });
