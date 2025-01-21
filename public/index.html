@@ -24,6 +24,7 @@
     crossorigin="anonymous"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script src="https://pfau-software.de/json-viewer/dist/iife/index.js"></script>
+    
   <style>
     body {
       overflow: scroll;
@@ -344,12 +345,12 @@
           </button>
         </div>
         <div class="modal-body">
-          <andypf-json-viewer></andypf-json-viewer>
+          <andypf-json-viewer>{"a":"b"}</andypf-json-viewer>
           <textarea  id="textAreaJSON" class="form-control" rows="8"></textarea>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-          <button type="button" class="btn btn-primary">Guardar</button>
+          <button type="button" class="btn btn-primary" id="guardarJSON">Guardar</button>
         </div>
       </div>
     </div>
