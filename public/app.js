@@ -38,7 +38,7 @@ $(document).ready(() => {
 	const fechas = (async () => {
 
 		console.log(new Date());
-		let d = new Date("2024-12-31");
+		let d = new Date();
 		let year = d.getFullYear();
 		let month = d.getMonth();
 
